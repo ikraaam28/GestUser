@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
@@ -44,13 +45,16 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
+        // Check if the user is authenticated
+        if ($token->getUser() instanceof UserInterface) {
+            // Redirect to the 'home' route
+            return new RedirectResponse($this->urlGenerator->generate('home'));
         }
 
-        // For example:
-         return new RedirectResponse($this->urlGenerator->generate('home'));
-        //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        // If the user is not authenticated, you can handle it as needed
+
+        // For example, redirect to the login page with an error message
+        return new RedirectResponse($this->urlGenerator->generate('app_login', ['error' => 'Authentication failed']));
     }
 
     protected function getLoginUrl(Request $request): string
