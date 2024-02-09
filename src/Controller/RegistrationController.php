@@ -7,12 +7,18 @@ use App\Form\RegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/registration', name: 'app_registration')]
+    /**
+     * @throws TransportExceptionInterface
+     */
+    #[Route('/register', name: 'app_registration')]
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
     {
         $user = new User();
@@ -31,7 +37,7 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // Redirect to a success page or login
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('registration/register.html.twig', [
